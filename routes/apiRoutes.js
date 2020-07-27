@@ -10,7 +10,7 @@ const dbInfo = require("../db/db.json");
 // changed to just "/notes" working as expected
 apiRouter.get("/notes", (req, res) => {
     // this will read the information stored in the db,json and return the data
-    fs.readFile("./db/db.json", "utf8", (err, data) => {
+    fs.readFileSync("./db/db.json", "utf8", (err, data) => {
         if (err) {
             throw err
         }
