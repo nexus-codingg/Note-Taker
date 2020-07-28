@@ -3,41 +3,33 @@
 const apiRouter = require("express").Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require('uuid');
-const dbInfo = require("../db/db.json");
 
 
 // when using "/api/notes" was getting a 404 error of cannot GET /api/nots 
 // changed to just "/notes" working as expected
 apiRouter.get("/notes", (req, res) => {
     // this will read the information stored in the db,json and return the data
-    fs.readFileSync("./db/db.json", "utf8", (err, data) => {
-        if (err) {
-            throw err
-        }
-        return res.json(JSON.parse(data));
-    })
-    res.send(console.log("successfully showing /api/notes information"));
+        console.log("successful GET of notes stored in db.json")
+        res.json(getNotes());
+    
 });
+
+function getNotes() {
+    return JSON.parse(fs.readFileSync("./db/db.json"));  
+}
 
 apiRouter.post("/notes", (req, res) => {
-    if (err) {
-        throw err
-    }
-    let noteArr = JSON.parse(fs.readFileSync("../db/db.json"));
+    let notesArr = getNotes();
     let note = req.body;
+    console.log(note);
     // uses uuid to add a random id to each note's data
-    note.id = uuid.v4();
+    note.id = uuidv4() + 1;
     // adds the array that stores all the note data
-    noteArr.push(note);
+    notesArr.push(note);
     //saves and updates the new notes array
-    fs.writeFileSync("db/db.json", JSON.stringify(notesArr), (err1) => {
-        if (err) throw err
-        else {
-            res.send(console.log("Successfully added a new note and the json.db file has been updated."));
-        }
+    fs.writeFileSync("./db/db.json", JSON.stringify(notesArr), "utf8")
+        res.json(note);
     });
-
-});
 
 
 module.exports = apiRouter;
