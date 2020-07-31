@@ -22,8 +22,8 @@ function getNotes() {
 apiRouter.post("/notes", (req, res) => {
     let notesArr = getNotes();
     let note = req.body;
-    // console nogs the note created and pushed to db.json
-    console.log(note);
+    // console logs the note created and pushed to db.json
+    // console.log(note);
     // uses uuid to add a random id to each note's data, but also removes dashes
     let randomID = uuidv4();
     let formatedID = randomID.replace(/[-\s]/g,"");
@@ -32,30 +32,36 @@ apiRouter.post("/notes", (req, res) => {
     notesArr.push(note);
     //saves and updates the new notes array
     fs.writeFileSync("./db/db.json", JSON.stringify(notesArr), "utf8");
-    console.log("Your note has been successfully created");
-    return res.json(note);
+    return res.json(note).send(console.log(`Your note has been successfully created: ${note.title}`));
+    
 });
 
 
 // delete the note by uuid
-apiRouter.delete("/notes/:id", (req, res) => {
-    let deleteNote = req.params.id;
-    // // this is the id of the note selected
-    // console.log(deleteNote);
-    let getSelectedNote = getNotes();
-    
-    // will loop through all the notes to find the selected id created by uuid
-    for(let i = 0; i < getSelectedNote.length; i++){
-        if(parseInt(getSelectedNote[i].id) == deleteNote){
-          //Splices the selected note 
-          getSelectedNote.splice(i, 1);
-          //Saves the new notes array (w/o the deleted note) to update the db.json file
-          fs.writeFileSync("db/db.json", JSON.stringify(getSelectedNote));
-          
-        } 
-      }
-      console.log("Your note has been successfully deleted!");
-      return res.json(JSON.parse(fs.readFileSync("./db/db.json")));
+apiRouter.delete('/notes/:id', function (req, res) {
+    let deletedNote = req.body.title;
+    console.log(`the note to be deleted is: ${deletedNote}`);
+
+    fs.readFile('./db/db.json', "utf8", function (err, data) {
+        if (err) throw err;
+        let noteData = JSON.parse(data)
+
+        // use filter, to remove the object with id = req.params.id, create a new array
+        let noteDataRemain = noteData.filter(obj => (obj.id !== req.params.id));
+        // Copy the content of this reduced array, to the current array 
+        notesArray = noteDataRemain;
+
+        // save it back to db.json
+        // before write to a file, convert object into JSON Text 
+        let notesArrayText = JSON.stringify(noteDataRemain);
+
+        fs.writeFile('./db/db.json', notesArrayText, function (err, data) {
+            if (err) throw err;
+            console.log("Your note has been deleted sucessfully!");
+            return res.json(true);
+        })
+    })
+
 })
 
 
