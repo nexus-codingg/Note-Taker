@@ -39,8 +39,9 @@ apiRouter.post("/notes", (req, res) => {
 
 // delete the note by uuid
 apiRouter.delete('/notes/:id', function (req, res) {
-    let deletedNote = req.body.title;
-    console.log(`the note to be deleted is: ${deletedNote}`);
+    // not logging not title, shows as undefined
+    // let deletedNote = req.body.title;
+    // console.log(`the note to be deleted is: ${deletedNote}`);
 
     fs.readFile('./db/db.json', "utf8", function (err, data) {
         if (err) throw err;
